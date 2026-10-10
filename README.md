@@ -31,6 +31,6 @@ The Prisma schema is in `prisma/schema.prisma`; Prisma 7 connection settings are
 
 ## Production deployment
 
-Set `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DATABASE_URL`, and `DIRECT_URL` in Vercel. Use Supabase's transaction pooler (`6543`) for `DATABASE_URL` and its session pooler (`5432`) or IPv6-accessible direct endpoint for `DIRECT_URL`. Apply committed migrations with `npm run db:deploy` using the migration URL. Set Google/GitHub credentials if those providers should be enabled, and configure the `/api/auth/callback/google` and `/api/auth/callback/github` provider callback URLs for the deployed domain.
+Set `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DATABASE_URL`, and `DIRECT_URL` in Vercel. Set `BETTER_AUTH_URL` to the exact production origin (for example, `https://your-project.vercel.app`) and, if setting `NEXT_PUBLIC_BETTER_AUTH_URL`, make it that same origin. The server also trusts Vercel's assigned deployment host for preview deployments. Use Supabase's transaction pooler (`6543`) for `DATABASE_URL` and its session pooler (`5432`) or IPv6-accessible direct endpoint for `DIRECT_URL`. Apply committed migrations with `npm run db:deploy` using the migration URL. Set Google/GitHub credentials if those providers should be enabled, set their public enable flags to `true`, and configure the `/api/auth/callback/google` and `/api/auth/callback/github` provider callback URLs for the deployed domain.
 
 Run `npm run lint` and `npm run build` before deployment.

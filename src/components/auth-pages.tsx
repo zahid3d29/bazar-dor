@@ -23,7 +23,11 @@ function SignInForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const next = searchParams.get("next") || "/";
+  const requestedNext = searchParams.get("next");
+  const next =
+    requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
+      ? requestedNext
+      : "/";
 
   useEffect(() => {
     if (!isPending && session) router.replace(next);
@@ -32,13 +36,19 @@ function SignInForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
-    const result = await authClient.signIn.email({ email, password });
-    if (result.error) toast.error(result.error.message || "সাইন ইন করা যায়নি");
-    else {
-      toast.success("স্বাগতম, সাইন ইন সম্পন্ন হয়েছে");
-      router.push(next);
+    try {
+      const result = await authClient.signIn.email({ email, password });
+      if (result.error) {
+        toast.error(result.error.message || "সাইন ইন করা যায়নি");
+      } else {
+        toast.success("স্বাগতম, সাইন ইন সম্পন্ন হয়েছে");
+        router.push(next);
+      }
+    } catch {
+      toast.error("সার্ভারে সংযোগ করা যায়নি। আবার চেষ্টা করুন।");
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   }
 
   return (
@@ -114,18 +124,23 @@ export function SignUpPage() {
     event.preventDefault();
     if (password !== confirm) return toast.error("দুটি পাসওয়ার্ড মিলছে না");
     setSubmitting(true);
-    const result = await authClient.signUp.email({
-      name: name.trim(),
-      email,
-      password,
-    });
-    if (result.error)
-      toast.error(result.error.message || "অ্যাকাউন্ট তৈরি হয়নি");
-    else {
-      toast.success("অ্যাকাউন্ট তৈরি হয়েছে, এখন সাইন ইন করুন");
-      router.push("/signin");
+    try {
+      const result = await authClient.signUp.email({
+        name: name.trim(),
+        email,
+        password,
+      });
+      if (result.error) {
+        toast.error(result.error.message || "অ্যাকাউন্ট তৈরি হয়নি");
+      } else {
+        toast.success("অ্যাকাউন্ট তৈরি হয়েছে");
+        router.push("/");
+      }
+    } catch {
+      toast.error("সার্ভারে সংযোগ করা যায়নি। আবার চেষ্টা করুন।");
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   }
 
   return (
@@ -211,12 +226,18 @@ function SocialButtons() {
       );
       return;
     }
-    const result = await authClient.signIn.social({
-      provider,
-      callbackURL: "/",
-    });
-    if (result.error)
-      toast.error(result.error.message || `${provider} দিয়ে সাইন ইন করা যায়নি`);
+    try {
+      const result = await authClient.signIn.social({
+        provider,
+        callbackURL: "/",
+      });
+      if (result.error)
+        toast.error(
+          result.error.message || `${provider} দিয়ে সাইন ইন করা যায়নি`,
+        );
+    } catch {
+      toast.error("সার্ভারে সংযোগ করা যায়নি। আবার চেষ্টা করুন।");
+    }
   }
 
   return (
