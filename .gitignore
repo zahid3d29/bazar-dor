@@ -34,6 +34,7 @@ yarn-error.log*
 .env*
 !.env.example
 /bazar-dor.sqlite*
+/src/generated/prisma/
 
 # vercel
 .vercel

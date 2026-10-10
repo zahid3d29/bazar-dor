@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
-import Database from "better-sqlite3";
-import { Pool } from "pg";
+import { prismaAdapter } from "@better-auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
 
 const socialProviders = {
   ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
@@ -22,9 +22,7 @@ const socialProviders = {
 };
 
 export const auth = betterAuth({
-  database: process.env.DATABASE_URL
-    ? new Pool({ connectionString: process.env.DATABASE_URL })
-    : new Database(process.env.AUTH_DATABASE_PATH ?? "./bazar-dor.sqlite"),
+  database: prismaAdapter(prisma, { provider: "postgresql" }),
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
   secret:
     process.env.BETTER_AUTH_SECRET ??

@@ -38,7 +38,9 @@ export function getCategories() {
 }
 
 async function fetchCatalog<T>(resource: "products" | "categories") {
-  const response = await fetch(`/api/catalog/${resource}`, { cache: "no-store" });
+  const response = await fetch(`/api/catalog/${resource}`, {
+    cache: "no-store",
+  });
   if (!response.ok) {
     throw new Error(
       "বাজারের তথ্য এখন পাওয়া যাচ্ছে না। কিছুক্ষণ পর আবার চেষ্টা করুন।",

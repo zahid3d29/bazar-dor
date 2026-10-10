@@ -6,7 +6,7 @@
 
 - Next.js 16 App Router and React 19
 - TypeScript and Tailwind CSS 4, with a custom responsive design system
-- Better Auth with SQLite locally or PostgreSQL in production, plus optional Google/GitHub OAuth
+- Better Auth with Prisma 7 and Supabase PostgreSQL, plus optional Google/GitHub OAuth
 - Live product and category data from the Bazar Dor API
 - Lucide icons and react-hot-toast
 
@@ -23,14 +23,14 @@
 ## Local development
 
 1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env.local` and set a private `BETTER_AUTH_SECRET` (at least 32 characters). Keep all secrets out of git.
-3. Create the local auth tables with `npm run auth:migrate` and confirm the migration when prompted.
+2. Copy `.env.example` to `.env`, then set `DATABASE_URL` to Supabase's transaction pooler connection string for app runtime and `DIRECT_URL` to its session pooler connection string for Prisma CLI migrations. Use the **Connect** panel in Supabase to get the pooler host, project-specific username, and password. Set a private `BETTER_AUTH_SECRET` (at least 32 characters). Keep `.env` out of git.
+3. Create the Prisma migration and generate the client with `npm run db:migrate -- --name init`.
 4. Run `npm run dev` and open `http://localhost:3000`.
 
-The SQLite file defaults to `./bazar-dor.sqlite` and is ignored by git. Google and GitHub buttons need the corresponding OAuth client ID/secret and registered callback URLs. Social providers are omitted from Better Auth when those values are absent; also set the matching `NEXT_PUBLIC_*_AUTH_ENABLED=true` flag to enable its button flow.
+The Prisma schema is in `prisma/schema.prisma`; Prisma 7 connection settings are in `prisma.config.ts`. Direct Supabase database hosts can resolve to IPv6 only; on an IPv4-only network use the session pooler on port `5432` for migrations. Do not use the transaction pooler on port `6543` for migrations. Google and GitHub buttons need the corresponding OAuth client ID/secret and registered callback URLs. Social providers are omitted from Better Auth when those values are absent; also set the matching `NEXT_PUBLIC_*_AUTH_ENABLED=true` flag to enable its button flow.
 
 ## Production deployment
 
-Set `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` in the hosting environment. For Vercel or another serverless host, set `DATABASE_URL` to a persistent PostgreSQL database; the included SQLite file is for local development only. Run the auth migration with the same database environment before deploying. Set Google/GitHub credentials if those providers should be enabled, and configure the `/api/auth/callback/google` and `/api/auth/callback/github` provider callback URLs for the deployed domain.
+Set `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DATABASE_URL`, and `DIRECT_URL` in Vercel. Use Supabase's transaction pooler (`6543`) for `DATABASE_URL` and its session pooler (`5432`) or IPv6-accessible direct endpoint for `DIRECT_URL`. Apply committed migrations with `npm run db:deploy` using the migration URL. Set Google/GitHub credentials if those providers should be enabled, and configure the `/api/auth/callback/google` and `/api/auth/callback/github` provider callback URLs for the deployed domain.
 
 Run `npm run lint` and `npm run build` before deployment.
