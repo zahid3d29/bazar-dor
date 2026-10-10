@@ -199,7 +199,18 @@ export function SignUpPage() {
 }
 
 function SocialButtons() {
+  const providers = {
+    google: process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true",
+    github: process.env.NEXT_PUBLIC_GITHUB_AUTH_ENABLED === "true",
+  };
+
   async function socialSignIn(provider: "google" | "github") {
+    if (!providers[provider]) {
+      toast.error(
+        `${provider === "google" ? "Google" : "GitHub"} OAuth চালু করতে সার্ভার কনফিগারেশন প্রয়োজন`,
+      );
+      return;
+    }
     const result = await authClient.signIn.social({
       provider,
       callbackURL: "/",

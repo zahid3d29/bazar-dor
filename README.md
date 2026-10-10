@@ -27,7 +27,7 @@
 3. Create the local auth tables with `npm run auth:migrate` and confirm the migration when prompted.
 4. Run `npm run dev` and open `http://localhost:3000`.
 
-The SQLite file defaults to `./bazar-dor.sqlite` and is ignored by git. Google and GitHub buttons need the corresponding OAuth client ID/secret and registered callback URLs. Social providers are omitted from Better Auth when those values are absent.
+The SQLite file defaults to `./bazar-dor.sqlite` and is ignored by git. Google and GitHub buttons need the corresponding OAuth client ID/secret and registered callback URLs. Social providers are omitted from Better Auth when those values are absent; also set the matching `NEXT_PUBLIC_*_AUTH_ENABLED=true` flag to enable its button flow.
 
 ## Production deployment
 

@@ -29,33 +29,22 @@ export type Category = {
   icon: string;
 };
 
-const API_HOSTS = [
-  "https://api.api-store.workers.dev/api/bazardor",
-  "https://api.abcz.workers.dev/api/bazardor",
-];
-
-async function fetchFromHosts<T>(path: string): Promise<T> {
-  for (const host of API_HOSTS) {
-    try {
-      const response = await fetch(`${host}${path}`, { cache: "no-store" });
-      if (!response.ok) continue;
-      return (await response.json()) as T;
-    } catch {
-      // Fall through to the alternative API host when the primary is unavailable.
-    }
-  }
-
-  throw new Error(
-    "বাজারের তথ্য এখন পাওয়া যাচ্ছে না। কিছুক্ষণ পর আবার চেষ্টা করুন।",
-  );
-}
-
 export function getProducts() {
-  return fetchFromHosts<Product[]>("/products");
+  return fetchCatalog<Product[]>("products");
 }
 
 export function getCategories() {
-  return fetchFromHosts<Category[]>("/categories");
+  return fetchCatalog<Category[]>("categories");
+}
+
+async function fetchCatalog<T>(resource: "products" | "categories") {
+  const response = await fetch(`/api/catalog/${resource}`, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(
+      "বাজারের তথ্য এখন পাওয়া যাচ্ছে না। কিছুক্ষণ পর আবার চেষ্টা করুন।",
+    );
+  }
+  return (await response.json()) as T;
 }
 
 export function toBengaliNumber(value: number) {
